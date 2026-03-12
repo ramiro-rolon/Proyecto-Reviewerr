@@ -1,0 +1,56 @@
+
+DELIMITER $$
+
+CREATE PROCEDURE QuitarVisualizacion(
+    IN p_opcion INT, 
+    IN p_id_usuario INT, 
+    IN p_id_contenido INT
+)
+BEGIN
+    IF p_opcion = 1 THEN -- Opción para quitar de una serie
+        DELETE FROM visualizaciones_por_serie
+        WHERE id_serie = p_id_contenido AND id_usuario = p_id_usuario;
+        
+    ELSEIF p_opcion = 2 THEN -- Opción para quitar de una película
+        DELETE FROM visualizaciones_por_pelicula
+        WHERE id_pelicula = p_id_contenido AND id_usuario = p_id_usuario;
+    END IF;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE FUNCTION HaVistoPelicula(
+    p_id_usuario INT, 
+    p_id_pelicula INT
+)
+RETURNS INT
+DETERMINISTIC
+BEGIN
+    DECLARE haVisto INT;
+    SELECT EXISTS (
+        SELECT 1 FROM visualizaciones_por_pelicula
+        WHERE id_usuario = p_id_usuario AND id_pelicula = p_id_pelicula
+        LIMIT 1
+    ) INTO haVisto;
+    RETURN haVisto;
+END$$
+
+CREATE FUNCTION HaVistoSerie(
+    p_id_usuario INT, 
+    p_id_serie INT
+)
+RETURNS INT
+DETERMINISTIC
+BEGIN
+    DECLARE haVisto INT;
+    SELECT EXISTS (
+        SELECT 1 FROM visualizaciones_por_serie
+        WHERE id_usuario = p_id_usuario AND id_serie = p_id_serie
+        LIMIT 1
+    ) INTO haVisto;
+    RETURN haVisto;
+END$$
+
+DELIMITER ;
